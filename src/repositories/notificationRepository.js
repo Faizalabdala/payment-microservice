@@ -1,8 +1,8 @@
 const prisma = require("../lib/prisma");
 
 class NotificationRepository {
-  async createNotification(data) {
-    return prisma.Notification.create({ data });
+  async create(data) {
+    return prisma.notification.create({ data });
   }
 }
 

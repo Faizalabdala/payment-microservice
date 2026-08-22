@@ -1,11 +1,15 @@
-const paymentRepository = require("../repositories/paymentRepository");
-const stripe = require("../lib/stripe");
-const notificationRepository = require("../repositories/notificationRepository");
+const { toCents } = require("../lib/money");
 
 class PaymentService {
+  constructor(stripe, paymentRepository, notificationRepository) {
+    this.stripe = stripe;
+    this.paymentRepository = paymentRepository;
+    this.notificationRepository = notificationRepository;
+  }
+
   async createPayment(input) {
-    const intent = await stripe.paymentIntents.create({
-      amount: Math.round(input.amount * 100),
+    const intent = await this.stripe.paymentIntents.create({
+      amount: toCents(input.amount),
       currency: (input.currency || "MZN").toLowerCase(),
       metadata: { userId: input.userId },
     });
@@ -18,11 +22,12 @@ class PaymentService {
       status: "pending",
     };
 
-    const pagamento = await paymentRepository.create(dados);
-    await notificationRepository.createNotification({
+    const pagamento = await this.paymentRepository.create(dados);
+
+    await this.notificationRepository.create({
       paymentId: pagamento.id,
       type: "email",
-      recipient: input.userId, // Mudar para email(Não se esqueça)
+      recipient: input.userId,
       sent: false,
     });
 
@@ -30,8 +35,8 @@ class PaymentService {
   }
 
   async getPayment(id) {
-    return paymentRepository.findById(id);
+    return this.paymentRepository.findById(id);
   }
 }
 
-module.exports = new PaymentService();
+module.exports = PaymentService; // a CLASSE, não uma instância
