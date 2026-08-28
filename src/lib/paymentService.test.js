@@ -1,7 +1,6 @@
 const PaymentService = require("../services/paymentService");
 
 describe("PaymentService.createPayment", () => {
-  
   let stripeFalsa;
   let paymentRepoFalso;
   let notificationRepoFalso;
@@ -57,7 +56,7 @@ describe("PaymentService.createPayment", () => {
       .fn()
       .mockRejectedValue(new Error("Stripe recusou o pagamento"));
 
-    // Espera-se que createPayment ATIRE  erro 
+    // Espera-se que createPayment ATIRE  erro
     await expect(
       service.createPayment({ userId: "user-1", amount: 750, currency: "MZN" }),
     ).rejects.toThrow("Stripe recusou o pagamento");
